@@ -153,6 +153,7 @@ public class PlayerActivity extends AppCompatActivity {
             }
         }
         if (item == null) { finish(); return; }
+        prefs.addRecentlyWatched(item);
 
         pipCloseReceiver = new BroadcastReceiver() {
             @Override public void onReceive(Context ctx, Intent i) { exitPlayer(); }
