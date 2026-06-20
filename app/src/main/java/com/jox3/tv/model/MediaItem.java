@@ -19,6 +19,8 @@ public class MediaItem implements Serializable {
     public int season = -1;
     public int episode = -1;
 
+    public String synopsis;
+
     public MediaItem() { }
 
     public MediaItem(String id, String name, String logoUrl, String url,
