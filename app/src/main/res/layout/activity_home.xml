@@ -51,6 +51,71 @@
             android:focusable="true" />
     </LinearLayout>
 
+    <!-- Pestañas de navegación reales -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="18dp"
+        android:paddingEnd="18dp"
+        android:paddingBottom="16dp">
+
+        <TextView
+            android:id="@+id/tab_home"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="22dp"
+            android:text="Inicio"
+            android:textColor="@color/text_primary"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <TextView
+            android:id="@+id/tab_channels"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="22dp"
+            android:text="Canales"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <TextView
+            android:id="@+id/tab_movies"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="22dp"
+            android:text="Películas"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <TextView
+            android:id="@+id/tab_series"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="22dp"
+            android:text="Series"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <TextView
+            android:id="@+id/tab_favorites"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Favoritos"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp"
+            android:clickable="true"
+            android:focusable="true" />
+    </LinearLayout>
+
     <!-- Barra de búsqueda expandible, oculta por defecto -->
     <LinearLayout
         android:id="@+id/search_bar_container"
