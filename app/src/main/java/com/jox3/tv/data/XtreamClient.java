@@ -9,7 +9,9 @@ import com.jox3.tv.model.PlaylistConfig;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -53,7 +55,25 @@ public class XtreamClient {
         }
     }
 
+    private Map<String, String> fetchCategoryNames(String action) {
+        Map<String, String> map = new HashMap<>();
+        try {
+            JsonArray arr = fetchArray(apiUrl(action));
+            if (arr == null) return map;
+            for (JsonElement el : arr) {
+                JsonObject o = el.getAsJsonObject();
+                String id = getStringOrNull(o, "category_id");
+                String name = getStringOrNull(o, "category_name");
+                if (id != null && name != null) map.put(id, name);
+            }
+        } catch (Exception ignored) {
+        }
+        return map;
+    }
+
     public List<MediaItem> getLiveChannels() throws IOException {
+        Map<String, String> categoryNames = fetchCategoryNames("get_live_categories");
+
         String url = apiUrl("get_live_streams");
         JsonArray arr = fetchArray(url);
         List<MediaItem> result = new ArrayList<>();
@@ -66,18 +86,21 @@ public class XtreamClient {
 
             String name = getStringOrNull(o, "name");
             String logo = getStringOrNull(o, "stream_icon");
-            String category = getStringOrNull(o, "category_id");
+            String categoryId = getStringOrNull(o, "category_id");
+            String categoryName = categoryNames.getOrDefault(categoryId, "General");
 
             String playUrl = baseUrl + "/live/" + user + "/" + pass + "/" + streamId + ".m3u8";
 
             result.add(new MediaItem(streamId, name != null ? name : "Canal " + streamId,
                     logo != null ? logo : "", playUrl,
-                    category != null ? category : "General", MediaItem.LIVE));
+                    categoryName, MediaItem.LIVE));
         }
         return result;
     }
 
     public List<MediaItem> getMovies() throws IOException {
+        Map<String, String> categoryNames = fetchCategoryNames("get_vod_categories");
+
         String url = apiUrl("get_vod_streams");
         JsonArray arr = fetchArray(url);
         List<MediaItem> result = new ArrayList<>();
@@ -90,7 +113,8 @@ public class XtreamClient {
 
             String name = getStringOrNull(o, "name");
             String logo = getStringOrNull(o, "stream_icon");
-            String category = getStringOrNull(o, "category_id");
+            String categoryId = getStringOrNull(o, "category_id");
+            String categoryName = categoryNames.getOrDefault(categoryId, "General");
             String ext = getStringOrNull(o, "container_extension");
             if (ext == null) ext = "mp4";
 
@@ -98,12 +122,14 @@ public class XtreamClient {
 
             result.add(new MediaItem(streamId, name != null ? name : "Película " + streamId,
                     logo != null ? logo : "", playUrl,
-                    category != null ? category : "General", MediaItem.VOD));
+                    categoryName, MediaItem.VOD));
         }
         return result;
     }
 
     public List<MediaItem> getSeries() throws IOException {
+        Map<String, String> categoryNames = fetchCategoryNames("get_series_categories");
+
         String url = apiUrl("get_series");
         JsonArray arr = fetchArray(url);
         List<MediaItem> result = new ArrayList<>();
@@ -116,11 +142,12 @@ public class XtreamClient {
 
             String name = getStringOrNull(o, "name");
             String logo = getStringOrNull(o, "cover");
-            String category = getStringOrNull(o, "category_id");
+            String categoryId = getStringOrNull(o, "category_id");
+            String categoryName = categoryNames.getOrDefault(categoryId, "General");
 
             MediaItem item = new MediaItem(seriesId, name != null ? name : "Serie " + seriesId,
                     logo != null ? logo : "", "",
-                    category != null ? category : "General", MediaItem.SERIES);
+                    categoryName, MediaItem.SERIES);
             item.seriesId = seriesId;
             result.add(item);
         }
