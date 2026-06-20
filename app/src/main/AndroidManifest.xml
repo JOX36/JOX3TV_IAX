@@ -40,5 +40,10 @@
             android:exported="false"
             android:screenOrientation="landscape" />
 
+        <activity
+            android:name=".ui.home.ContentListActivity"
+            android:exported="false"
+            android:screenOrientation="landscape" />
+
     </application>
 </manifest>
