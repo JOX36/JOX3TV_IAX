@@ -225,6 +225,20 @@ public class HomeActivity extends AppCompatActivity {
                 inputSearch.requestFocus();
             }
         });
+
+        View btnSeeAllLive = findViewById(R.id.btn_see_all_live);
+        View btnSeeAllMovies = findViewById(R.id.btn_see_all_movies);
+        View btnSeeAllSeries = findViewById(R.id.btn_see_all_series);
+
+        btnSeeAllLive.setOnClickListener(v -> openContentList(MediaItem.LIVE));
+        btnSeeAllMovies.setOnClickListener(v -> openContentList(MediaItem.VOD));
+        btnSeeAllSeries.setOnClickListener(v -> openContentList(MediaItem.SERIES));
+    }
+
+    private void openContentList(String type) {
+        Intent intent = new Intent(this, ContentListActivity.class);
+        intent.putExtra(ContentListActivity.EXTRA_TYPE, type);
+        startActivity(intent);
     }
 
     private void refreshContent() {
