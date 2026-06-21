@@ -787,17 +787,37 @@ public class PlayerActivity extends AppCompatActivity {
     };
 
     private void enterPip() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            try {
-                topBar.setVisibility(View.GONE);
-                bottomBar.setVisibility(View.GONE);
-                handler.removeCallbacksAndMessages(null);
-                PictureInPictureParams params = new PictureInPictureParams.Builder()
-                        .setAspectRatio(new Rational(16, 9)).build();
-                enterPictureInPictureMode(params);
-            } catch (Exception e) {
-                Toast.makeText(this, "PiP no disponible", Toast.LENGTH_SHORT).show();
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            Toast.makeText(this, "PiP requiere Android 8 o superior", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        boolean systemSupportsPip = getPackageManager()
+                .hasSystemFeature(android.content.pm.PackageManager.FEATURE_PICTURE_IN_PICTURE);
+        if (!systemSupportsPip) {
+            Toast.makeText(this,
+                    "Este dispositivo/ROM no soporta Picture-in-Picture estándar de Android",
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        try {
+            topBar.setVisibility(View.GONE);
+            bottomBar.setVisibility(View.GONE);
+            handler.removeCallbacksAndMessages(null);
+            PictureInPictureParams params = new PictureInPictureParams.Builder()
+                    .setAspectRatio(new Rational(16, 9)).build();
+            boolean entered = enterPictureInPictureMode(params);
+            if (!entered) {
+                Toast.makeText(this,
+                        "El sistema rechazó la solicitud de PiP (entered=false)",
+                        Toast.LENGTH_LONG).show();
+                showBars();
             }
+        } catch (Exception e) {
+            Toast.makeText(this, "Error PiP: " + e.getClass().getSimpleName()
+                    + " - " + e.getMessage(), Toast.LENGTH_LONG).show();
+            showBars();
         }
     }
 
