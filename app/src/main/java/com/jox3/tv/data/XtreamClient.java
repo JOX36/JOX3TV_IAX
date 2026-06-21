@@ -18,6 +18,10 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+/**
+ * Cliente para servidores Xtream Codes. Usa la API player_api.php para
+ * obtener categorías y streams (live, vod, series).
+ */
 public class XtreamClient {
 
     private final OkHttpClient http;
@@ -55,6 +59,11 @@ public class XtreamClient {
         }
     }
 
+    /**
+     * Descarga el mapa categoryId -> categoryName para el tipo de acción dado
+     * (get_live_categories, get_vod_categories o get_series_categories).
+     * Si falla, devuelve un mapa vacío (los items quedarán con "General").
+     */
     private Map<String, String> fetchCategoryNames(String action) {
         Map<String, String> map = new HashMap<>();
         try {
@@ -67,6 +76,7 @@ public class XtreamClient {
                 if (id != null && name != null) map.put(id, name);
             }
         } catch (Exception ignored) {
+            // Si la API no responde, seguimos con categorías vacías sin romper la carga
         }
         return map;
     }
@@ -154,6 +164,13 @@ public class XtreamClient {
         return result;
     }
 
+    /**
+     * Obtiene la sinopsis ("plot") real de una película específica.
+     * Esta es una llamada extra por película (no incluida en el listado
+     * general), así que solo se debe usar para casos puntuales como el
+     * carrusel destacado, nunca para todo el catálogo.
+     * Devuelve null si falla o si la API no trae el campo.
+     */
     public String getVodSynopsis(String streamId) {
         try {
             String url = baseUrl + "/player_api.php?username=" + user + "&password=" + pass
@@ -173,6 +190,7 @@ public class XtreamClient {
         }
     }
 
+    /** Igual que getVodSynopsis pero para series (action distinto). */
     public String getSeriesSynopsis(String seriesId) {
         try {
             String url = baseUrl + "/player_api.php?username=" + user + "&password=" + pass
@@ -221,12 +239,24 @@ public class XtreamClient {
 
                     String playUrl = baseUrl + "/series/" + user + "/" + pass + "/" + epId + "." + ext;
 
+                    // Algunos paneles Xtream incluyen miniatura y sinopsis por
+                    // episodio dentro de un sub-objeto "info"
+                    String episodeImage = null;
+                    String episodePlot = null;
+                    if (ep.has("info") && ep.get("info").isJsonObject()) {
+                        JsonObject info = ep.getAsJsonObject("info");
+                        episodeImage = getStringOrNull(info, "movie_image");
+                        if (episodeImage == null) episodeImage = getStringOrNull(info, "cover_big");
+                        episodePlot = getStringOrNull(info, "plot");
+                    }
+
                     MediaItem item = new MediaItem(epId,
                             title != null ? title : "Episodio " + epNum,
-                            "", playUrl, "Serie", MediaItem.SERIES);
+                            episodeImage != null ? episodeImage : "", playUrl, "Serie", MediaItem.SERIES);
                     item.seriesId = seriesId;
                     item.season = seasonNum;
                     item.episode = epNum;
+                    item.synopsis = episodePlot;
                     result.add(item);
                 }
             }
