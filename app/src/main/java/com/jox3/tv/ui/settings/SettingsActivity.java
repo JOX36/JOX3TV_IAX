@@ -33,7 +33,7 @@ import java.util.concurrent.Executors;
 public class SettingsActivity extends AppCompatActivity {
 
     private LinearLayout formXtream, formM3u, cardActiveList;
-    private Button tabXtream, tabM3u, btnSaveXtream, btnSaveM3u, btnDeleteList;
+    private Button tabXtream, tabM3u, btnSaveXtream, btnSaveM3u, btnDeleteList, btnSwitchAccount;
     private EditText inputNameXtream, inputServer, inputUser, inputPass;
     private EditText inputNameM3u, inputM3uUrl;
     private ProgressBar progressLoading;
@@ -53,6 +53,19 @@ public class SettingsActivity extends AppCompatActivity {
         setupTabs();
         setupActions();
         loadExistingConfig();
+        showAppVersion();
+    }
+
+    private void showAppVersion() {
+        TextView tvVersion = findViewById(R.id.tv_app_version);
+        if (tvVersion == null) return;
+        try {
+            String versionName = getPackageManager()
+                    .getPackageInfo(getPackageName(), 0).versionName;
+            tvVersion.setText("JOX3 TV · versión " + versionName);
+        } catch (Exception e) {
+            tvVersion.setText("JOX3 TV");
+        }
     }
 
     private void bindViews() {
@@ -65,6 +78,7 @@ public class SettingsActivity extends AppCompatActivity {
         btnSaveXtream = findViewById(R.id.btn_save_xtream);
         btnSaveM3u = findViewById(R.id.btn_save_m3u);
         btnDeleteList = findViewById(R.id.btn_delete_list);
+        btnSwitchAccount = findViewById(R.id.btn_switch_account);
 
         inputNameXtream = findViewById(R.id.input_name_xtream);
         inputServer = findViewById(R.id.input_server);
@@ -98,6 +112,7 @@ public class SettingsActivity extends AppCompatActivity {
         btnSaveXtream.setOnClickListener(v -> onSaveXtream());
         btnSaveM3u.setOnClickListener(v -> onSaveM3u());
         btnDeleteList.setOnClickListener(v -> onDeleteList());
+        btnSwitchAccount.setOnClickListener(v -> onSwitchAccount());
     }
 
     private void loadExistingConfig() {
@@ -126,12 +141,42 @@ public class SettingsActivity extends AppCompatActivity {
         AppState state = AppState.get();
         cardActiveList.setVisibility(View.VISIBLE);
         tvActiveName.setText("● " + config.name);
-        tvActiveMeta.setText(
-                ("xtream".equals(config.type) ? "Xtream Codes" : "Lista M3U") + " · "
-                        + state.liveChannels.size() + " canales · "
-                        + state.movies.size() + " películas · "
-                        + state.series.size() + " series");
+
+        StringBuilder meta = new StringBuilder();
+        meta.append("xtream".equals(config.type) ? "Xtream Codes" : "Lista M3U").append(" · ")
+                .append(state.liveChannels.size()).append(" canales · ")
+                .append(state.movies.size()).append(" películas · ")
+                .append(state.series.size()).append(" series");
+
+        if ("xtream".equals(config.type)) {
+            if (config.createdAtEpoch > 0) {
+                meta.append("\nCreada: ").append(formatDate(config.createdAtEpoch));
+            }
+            if (config.expDateEpoch > 0) {
+                long daysLeft = daysUntil(config.expDateEpoch);
+                meta.append("\nVence: ").append(formatDate(config.expDateEpoch));
+                if (daysLeft >= 0) {
+                    meta.append("  (").append(daysLeft).append(daysLeft == 1 ? " día restante)" : " días restantes)");
+                } else {
+                    meta.append("  (vencida)");
+                }
+            }
+        }
+
+        tvActiveMeta.setText(meta.toString());
     }
+
+    private String formatDate(long epochSeconds) {
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd MMM yyyy", new java.util.Locale("es"));
+        return sdf.format(new java.util.Date(epochSeconds * 1000L));
+    }
+
+    private long daysUntil(long epochSeconds) {
+        long diffMs = (epochSeconds * 1000L) - System.currentTimeMillis();
+        return diffMs / (1000L * 60 * 60 * 24);
+    }
+
+    // ---------------- XTREAM ----------------
 
     private void onSaveXtream() {
         String name = textOf(inputNameXtream, "Mi Lista Privada");
@@ -167,6 +212,10 @@ public class SettingsActivity extends AppCompatActivity {
                 List<MediaItem> movies = client.getMovies();
                 List<MediaItem> series = client.getSeries();
 
+                long[] dates = client.getAccountDates();
+                config.createdAtEpoch = dates[0];
+                config.expDateEpoch = dates[1];
+
                 AppState state = AppState.get();
                 state.liveChannels = live;
                 state.movies = movies;
@@ -188,6 +237,8 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
     }
+
+    // ---------------- M3U ----------------
 
     private void onSaveM3u() {
         String name = textOf(inputNameM3u, "Mi Lista M3U");
@@ -248,6 +299,8 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
+    // ---------------- Eliminar lista ----------------
+
     private void onDeleteList() {
         prefs.clearPlaylistConfig();
         AppState state = AppState.get();
@@ -262,6 +315,28 @@ public class SettingsActivity extends AppCompatActivity {
         setStatus("Lista eliminada.");
         Toast.makeText(this, "Lista eliminada", Toast.LENGTH_SHORT).show();
     }
+
+    /** Limpia la cuenta actual y deja los campos listos para ingresar una
+     *  nueva, sin necesidad de pasar primero por "Eliminar lista". */
+    private void onSwitchAccount() {
+        prefs.clearPlaylistConfig();
+        AppState state = AppState.get();
+        state.liveChannels.clear();
+        state.movies.clear();
+        state.series.clear();
+        cardActiveList.setVisibility(View.GONE);
+        inputServer.setText("");
+        inputUser.setText("");
+        inputPass.setText("");
+        inputM3uUrl.setText("");
+        inputNameXtream.setText("");
+        inputNameM3u.setText("");
+        setStatus("Ingresa los datos de la nueva cuenta o lista.");
+        inputServer.requestFocus();
+        Toast.makeText(this, "Listo para una cuenta nueva", Toast.LENGTH_SHORT).show();
+    }
+
+    // ---------------- Helpers de UI ----------------
 
     private void setLoading(boolean loading, String status) {
         mainHandler.post(() -> {
