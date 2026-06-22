@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="bg_primary">#0D0D11</color>
-    <color name="bg_secondary">#1A1A24</color>
-    <color name="bg_card">#22222E</color>
-    <color name="accent">#FF4D2D</color>
-    <color name="accent_dark">#C73A1D</color>
-    <color name="accent_warm">#FF8A3D</color>
-    <color name="accent_pink">#E63B7A</color>
+    <color name="bg_primary">#0B0B12</color>
+    <color name="bg_secondary">#1C1C2A</color>
+    <color name="bg_card">#262638</color>
+    <color name="accent">#FF5722</color>
+    <color name="accent_dark">#D84315</color>
+    <color name="accent_warm">#FFA726</color>
+    <color name="accent_pink">#FF2D78</color>
+    <color name="accent_purple">#7C4DFF</color>
     <color name="text_primary">#FFFFFF</color>
-    <color name="text_secondary">#A5A5B5</color>
-    <color name="live_badge">#FF3B3B</color>
-    <color name="favorite_yellow">#FFC940</color>
-    <color name="success_green">#3DDC84</color>
-    <color name="warning_orange">#FFB020</color>
+    <color name="text_secondary">#B8B8CC</color>
+    <color name="live_badge">#FF1744</color>
+    <color name="favorite_yellow">#FFD740</color>
+    <color name="success_green">#00E676</color>
+    <color name="warning_orange">#FFAB40</color>
 </resources>
