@@ -103,6 +103,8 @@ public class PlayerActivity extends AppCompatActivity {
     private MediaItem item;
     private AppPrefs prefs;
     private TextView tvEpgNow;
+    private LinearLayout tvEpgProgressTrack;
+    private View tvEpgProgressFill;
     private final java.util.concurrent.ExecutorService epgExecutor =
             java.util.concurrent.Executors.newSingleThreadExecutor();
     private AppState state;
@@ -245,6 +247,8 @@ public class PlayerActivity extends AppCompatActivity {
         bottomBar = findViewById(R.id.bottom_bar);
         tvName = findViewById(R.id.tv_name);
         tvEpgNow = findViewById(R.id.tv_epg_now);
+        tvEpgProgressTrack = findViewById(R.id.tv_epg_progress_track);
+        tvEpgProgressFill = findViewById(R.id.tv_epg_progress_fill);
         tvResolution = findViewById(R.id.tv_resolution);
         tvStatus = findViewById(R.id.tv_status);
         btnBack = findViewById(R.id.btn_back);
@@ -832,6 +836,7 @@ public class PlayerActivity extends AppCompatActivity {
     private void loadEpgForCurrentChannel() {
         if (tvEpgNow == null) return;
         tvEpgNow.setVisibility(View.GONE);
+        if (tvEpgProgressTrack != null) tvEpgProgressTrack.setVisibility(View.GONE);
 
         PlaylistConfig config = prefs.getPlaylistConfig();
         if (config == null || !PlaylistConfig.TYPE_XTREAM.equals(config.type)) return;
@@ -847,6 +852,15 @@ public class PlayerActivity extends AppCompatActivity {
                 if (item == channelAtRequestTime) {
                     tvEpgNow.setText("Ahora: " + now.title);
                     tvEpgNow.setVisibility(View.VISIBLE);
+
+                    int percent = now.progressPercent();
+                    if (percent >= 0 && tvEpgProgressTrack != null) {
+                        tvEpgProgressTrack.setVisibility(View.VISIBLE);
+                        LinearLayout.LayoutParams params =
+                                (LinearLayout.LayoutParams) tvEpgProgressFill.getLayoutParams();
+                        params.weight = percent;
+                        tvEpgProgressFill.setLayoutParams(params);
+                    }
                 }
             });
         });
@@ -945,6 +959,7 @@ public class PlayerActivity extends AppCompatActivity {
             }
 
             holder.epgNow.setVisibility(View.GONE);
+            holder.epgProgressTrack.setVisibility(View.GONE);
             PlaylistConfig config = prefs.getPlaylistConfig();
             if (config != null && PlaylistConfig.TYPE_XTREAM.equals(config.type)) {
                 epgExecutor.execute(() -> {
@@ -955,6 +970,15 @@ public class PlayerActivity extends AppCompatActivity {
                     handler.post(() -> {
                         holder.epgNow.setText("Ahora: " + now.title);
                         holder.epgNow.setVisibility(View.VISIBLE);
+
+                        int percent = now.progressPercent();
+                        if (percent >= 0) {
+                            holder.epgProgressTrack.setVisibility(View.VISIBLE);
+                            LinearLayout.LayoutParams params =
+                                    (LinearLayout.LayoutParams) holder.epgProgressFill.getLayoutParams();
+                            params.weight = percent;
+                            holder.epgProgressFill.setLayoutParams(params);
+                        }
                     });
                 });
             }
@@ -983,7 +1007,8 @@ public class PlayerActivity extends AppCompatActivity {
         class RowHolder extends RecyclerView.ViewHolder {
             ImageView logo;
             TextView name, epgNow;
-            View selectedBar;
+            View selectedBar, epgProgressFill;
+            LinearLayout epgProgressTrack;
 
             RowHolder(@NonNull View itemView) {
                 super(itemView);
@@ -991,6 +1016,8 @@ public class PlayerActivity extends AppCompatActivity {
                 name = itemView.findViewById(R.id.channel_name);
                 epgNow = itemView.findViewById(R.id.channel_epg_now);
                 selectedBar = itemView.findViewById(R.id.channel_selected_bar);
+                epgProgressTrack = itemView.findViewById(R.id.channel_epg_progress_track);
+                epgProgressFill = itemView.findViewById(R.id.channel_epg_progress_fill);
             }
         }
     }
