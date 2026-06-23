@@ -205,6 +205,17 @@ public class XtreamClient {
         public String start;   // "HH:mm" ya formateado
         public String end;
         public boolean isNow;
+        public long startEpoch = -1; // segundos Unix, -1 si no disponible
+        public long endEpoch = -1;
+
+        /** Porcentaje de avance del programa (0-100), o -1 si no se puede calcular. */
+        public int progressPercent() {
+            if (startEpoch <= 0 || endEpoch <= 0 || endEpoch <= startEpoch) return -1;
+            long now = System.currentTimeMillis() / 1000L;
+            if (now < startEpoch) return 0;
+            if (now > endEpoch) return 100;
+            return (int) (((now - startEpoch) * 100L) / (endEpoch - startEpoch));
+        }
     }
 
     /**
@@ -234,6 +245,12 @@ public class XtreamClient {
                     program.start = formatEpgTime(getStringOrNull(ep, "start"));
                     program.end = formatEpgTime(getStringOrNull(ep, "end"));
                     program.isNow = i == 0;
+
+                    String startTs = getStringOrNull(ep, "start_timestamp");
+                    String stopTs = getStringOrNull(ep, "stop_timestamp");
+                    if (startTs != null) program.startEpoch = parseLongSafe(startTs);
+                    if (stopTs != null) program.endEpoch = parseLongSafe(stopTs);
+
                     if (program.title != null) result.add(program);
                 }
             }
