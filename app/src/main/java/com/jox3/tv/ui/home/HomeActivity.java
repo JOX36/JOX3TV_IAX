@@ -100,6 +100,19 @@ public class HomeActivity extends AppCompatActivity {
         setupSearch();
         setupButtons();
         checkCrashLog();
+        applyOrientationLayout();
+    }
+
+    /**
+     * En vertical, el mini-reproductor se oculta y el banner ocupa todo el
+     * ancho (LinearLayout redistribuye el espacio automáticamente al quitar
+     * un hijo con peso). En horizontal, vuelve a mostrarse el mini-reproductor
+     * al lado del banner como siempre.
+     */
+    private void applyOrientationLayout() {
+        boolean isPortrait = getResources().getConfiguration().orientation
+                == android.content.res.Configuration.ORIENTATION_PORTRAIT;
+        miniPlayerContainer.setVisibility(isPortrait ? View.GONE : View.VISIBLE);
     }
 
     private void checkCrashLog() {
@@ -183,6 +196,13 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void initMiniPlayer() {
+        boolean isPortrait = getResources().getConfiguration().orientation
+                == android.content.res.Configuration.ORIENTATION_PORTRAIT;
+        if (isPortrait) {
+            miniPlayerContainer.setVisibility(View.GONE);
+            return;
+        }
+
         AppState state = AppState.get();
         if (state.liveChannels.isEmpty()) {
             miniPlayerContainer.setVisibility(View.GONE);
