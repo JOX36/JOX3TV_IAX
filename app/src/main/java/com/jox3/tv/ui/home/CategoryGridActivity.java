@@ -32,8 +32,8 @@ public class CategoryGridActivity extends AppCompatActivity {
     private static final int GRID_COLUMNS = 3;
 
     private ImageView btnBack;
-    private TextView tvTitle, tvTotalCount;
-    private RecyclerView gridRecycler, categorySwitcher;
+    private TextView tvTitle, tvTotalCount, btnCategoryToggle;
+    private RecyclerView gridRecycler, categoryDropdownList;
     private AppPrefs prefs;
     private String contentType;
     private String currentCategory;
@@ -48,21 +48,27 @@ public class CategoryGridActivity extends AppCompatActivity {
         tvTitle = findViewById(R.id.tv_category_title);
         tvTotalCount = findViewById(R.id.tv_total_count);
         gridRecycler = findViewById(R.id.grid_recycler);
-        categorySwitcher = findViewById(R.id.category_switcher);
+        btnCategoryToggle = findViewById(R.id.btn_category_toggle);
+        categoryDropdownList = findViewById(R.id.category_dropdown_list);
 
         btnBack.setOnClickListener(v -> finish());
+        btnCategoryToggle.setOnClickListener(v -> toggleCategoryDropdown());
 
         contentType = getIntent().getStringExtra(EXTRA_TYPE);
         currentCategory = getIntent().getStringExtra(EXTRA_CATEGORY);
         if (contentType == null) contentType = MediaItem.LIVE;
         if (currentCategory == null) currentCategory = "General";
 
-        categorySwitcher.setLayoutManager(
-                new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        categoryDropdownList.setLayoutManager(new LinearLayoutManager(this));
         gridRecycler.setLayoutManager(new GridLayoutManager(this, GRID_COLUMNS));
 
         buildCategorySwitcher();
         showCategory(currentCategory);
+    }
+
+    private void toggleCategoryDropdown() {
+        boolean isVisible = categoryDropdownList.getVisibility() == View.VISIBLE;
+        categoryDropdownList.setVisibility(isVisible ? View.GONE : View.VISIBLE);
     }
 
     private List<MediaItem> getSourceList() {
@@ -81,7 +87,7 @@ public class CategoryGridActivity extends AppCompatActivity {
         }
     }
 
-    /** Construye los chips con todas las categorías disponibles para este tipo. */
+    /** Construye la lista desplegable con todas las categorías disponibles para este tipo. */
     private void buildCategorySwitcher() {
         LinkedHashSet<String> categories = new LinkedHashSet<>();
         for (MediaItem item : getSourceList()) {
@@ -90,13 +96,17 @@ public class CategoryGridActivity extends AppCompatActivity {
         }
 
         List<String> categoryList = new ArrayList<>(categories);
-        categorySwitcher.setAdapter(new CategoryChipAdapter(categoryList, this::showCategory));
+        categoryDropdownList.setAdapter(new CategoryDropdownAdapter(categoryList, category -> {
+            categoryDropdownList.setVisibility(View.GONE);
+            showCategory(category);
+        }));
     }
 
     /** Cambia la grilla a otra categoría, sin salir ni recargar toda la pantalla. */
     private void showCategory(String category) {
         currentCategory = category;
         tvTitle.setText(category);
+        btnCategoryToggle.setText(category + "  ▾");
 
         List<MediaItem> filtered = new ArrayList<>();
         for (MediaItem item : getSourceList()) {
