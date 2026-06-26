@@ -56,7 +56,7 @@ public class CategoryChipAdapter extends RecyclerView.Adapter<CategoryChipAdapte
             v.refreshDrawableState();
             if (hasFocus) {
                 v.bringToFront();
-                v.animate().scaleX(1.08f).scaleY(1.08f).setDuration(120).start();
+                v.animate().scaleX(1.1f).scaleY(1.1f).setDuration(120).start();
             } else {
                 v.animate().scaleX(1.0f).scaleY(1.0f).setDuration(120).start();
             }
@@ -108,18 +108,18 @@ public class CategoryChipAdapter extends RecyclerView.Adapter<CategoryChipAdapte
     private static Drawable buildFocusRing() {
         GradientDrawable dimBg = new GradientDrawable();
         dimBg.setShape(GradientDrawable.RECTANGLE);
-        dimBg.setColor(0x3000FF88);
+        dimBg.setColor(0x220099FF);
         dimBg.setCornerRadius(dp(10));
 
         GradientDrawable glow = new GradientDrawable();
         glow.setShape(GradientDrawable.RECTANGLE);
-        glow.setStroke(dp(7), 0x4400FF88);
+        glow.setStroke(dp(6), 0x330099FF);
         glow.setCornerRadius(dp(10));
         glow.setColor(0x00000000);
 
         GradientDrawable ring = new GradientDrawable();
         ring.setShape(GradientDrawable.RECTANGLE);
-        ring.setStroke(dp(3), 0xFF00FF88);
+        ring.setStroke(dp(2), 0xFF0099FF);
         ring.setCornerRadius(dp(10));
         ring.setColor(0x00000000);
 

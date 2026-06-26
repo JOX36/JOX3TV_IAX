@@ -4,21 +4,21 @@
         <layer-list>
             <item>
                 <shape android:shape="rectangle">
-                    <solid android:color="#3000FF88" />
-                    <corners android:radius="10dp" />
+                    <solid android:color="#220099FF" />
+                    <corners android:radius="12dp" />
                 </shape>
             </item>
             <item>
                 <shape android:shape="rectangle">
-                    <stroke android:width="7dp" android:color="#4400FF88" />
-                    <corners android:radius="10dp" />
+                    <stroke android:width="6dp" android:color="#330099FF" />
+                    <corners android:radius="12dp" />
                     <solid android:color="@android:color/transparent" />
                 </shape>
             </item>
             <item>
                 <shape android:shape="rectangle">
-                    <stroke android:width="3dp" android:color="#00FF88" />
-                    <corners android:radius="10dp" />
+                    <stroke android:width="2dp" android:color="#0099FF" />
+                    <corners android:radius="12dp" />
                     <solid android:color="@android:color/transparent" />
                 </shape>
             </item>

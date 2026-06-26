@@ -72,6 +72,16 @@ public class MediaCardAdapter extends RecyclerView.Adapter<MediaCardAdapter.Card
             holder.imgLogo.setImageDrawable(null);
         }
 
+        // Focus animation for D-pad / remote control
+        holder.itemView.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                v.animate().scaleX(1.05f).scaleY(1.05f).setDuration(150).start();
+                v.bringToFront();
+            } else {
+                v.animate().scaleX(1.0f).scaleY(1.0f).setDuration(150).start();
+            }
+        });
+
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onClick(item, position);
         });

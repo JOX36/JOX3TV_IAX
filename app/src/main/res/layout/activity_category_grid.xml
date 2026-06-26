@@ -81,6 +81,7 @@
         android:paddingStart="14dp"
         android:paddingEnd="14dp"
         android:paddingBottom="20dp"
-        android:clipToPadding="false" />
+        android:clipToPadding="false"
+        android:descendantFocusability="afterDescendants" />
 
 </LinearLayout>

@@ -236,33 +236,9 @@
                         <androidx.viewpager2.widget.ViewPager2
                             android:id="@+id/hero_pager"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent" />
-
-                        <ImageView
-                            android:id="@+id/btn_hero_prev"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:layout_gravity="center_vertical|start"
-                            android:layout_margin="8dp"
-                            android:background="#88000000"
-                            android:padding="8dp"
-                            android:src="@drawable/ic_arrow_prev"
-                            android:clickable="true"
+                            android:layout_height="match_parent"
                             android:focusable="true"
-                            android:foreground="@drawable/bg_focus_overlay" />
-
-                        <ImageView
-                            android:id="@+id/btn_hero_next"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:layout_gravity="center_vertical|end"
-                            android:layout_margin="8dp"
-                            android:background="#88000000"
-                            android:padding="8dp"
-                            android:src="@drawable/ic_arrow_next"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:foreground="@drawable/bg_focus_overlay" />
+                            android:focusableInTouchMode="true" />
                     </FrameLayout>
 
                     <LinearLayout
