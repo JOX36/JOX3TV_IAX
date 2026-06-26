@@ -1328,6 +1328,35 @@ public class PlayerActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean dispatchKeyEvent(android.view.KeyEvent event) {
+        if (event.getAction() != android.view.KeyEvent.ACTION_DOWN) {
+            return super.dispatchKeyEvent(event);
+        }
+        if (screenLocked) return super.dispatchKeyEvent(event);
+
+        int keyCode = event.getKeyCode();
+
+        // OK / Enter → toggle bars
+        if (keyCode == android.view.KeyEvent.KEYCODE_DPAD_CENTER
+                || keyCode == android.view.KeyEvent.KEYCODE_ENTER) {
+            if (channelPanelOpen) { closeChannelPanel(); return true; }
+            toggleBars();
+            return true;
+        }
+
+        // Any D-pad key → show bars if hidden
+        if (!barsVisible && (keyCode == android.view.KeyEvent.KEYCODE_DPAD_UP
+                || keyCode == android.view.KeyEvent.KEYCODE_DPAD_DOWN
+                || keyCode == android.view.KeyEvent.KEYCODE_DPAD_LEFT
+                || keyCode == android.view.KeyEvent.KEYCODE_DPAD_RIGHT)) {
+            showBars();
+            return true;
+        }
+
+        return super.dispatchKeyEvent(event);
+    }
+
     @Override protected void onDestroy() {
         super.onDestroy();
         epgExecutor.shutdownNow();

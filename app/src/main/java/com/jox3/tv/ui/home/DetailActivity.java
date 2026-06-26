@@ -213,6 +213,10 @@ public class DetailActivity extends AppCompatActivity {
             int index = seasonLabels.indexOf(label);
             if (index >= 0) selectSeason(seasonNumbers.get(index));
         }));
+
+        // D-pad: let season chips receive focus properly
+        seasonChips.setFocusable(false);
+        seasonChips.setFocusableInTouchMode(false);
     }
 
     private void selectSeason(int season) {

@@ -158,6 +158,41 @@ public class HomeActivity extends AppCompatActivity {
         synopsisExecutor.shutdownNow();
     }
 
+    @Override
+    public boolean dispatchKeyEvent(android.view.KeyEvent event) {
+        // ViewPager2 intercepts D-pad events before any listener can see them.
+        // We catch them here at the Activity level to cycle through hero slides.
+        if (event.getAction() == android.view.KeyEvent.ACTION_DOWN
+                && heroPager != null && heroAdapter != null) {
+            int count = heroAdapter.getItemCount();
+            if (count > 0) {
+                View focused = getCurrentFocus();
+                // Only intercept if focus is ON the pager or its children
+                if (focused != null && isChildOf(focused, heroPager)) {
+                    int current = heroPager.getCurrentItem();
+                    if (event.getKeyCode() == android.view.KeyEvent.KEYCODE_DPAD_LEFT) {
+                        heroPager.setCurrentItem((current - 1 + count) % count, true);
+                        return true;
+                    } else if (event.getKeyCode() == android.view.KeyEvent.KEYCODE_DPAD_RIGHT) {
+                        heroPager.setCurrentItem((current + 1) % count, true);
+                        return true;
+                    }
+                }
+            }
+        }
+        return super.dispatchKeyEvent(event);
+    }
+
+    private boolean isChildOf(View child, View parent) {
+        View current = child;
+        while (current != null) {
+            if (current == parent) return true;
+            View p = (View) current.getParent();
+            current = (p instanceof View) ? p : null;
+        }
+        return false;
+    }
+
     // ---------------- Mini-reproductor de canal en vivo ----------------
 
     private androidx.media3.datasource.DataSource.Factory trustAllDataSourceFactory;
@@ -388,21 +423,8 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-        // D-pad navigation: left/right cycles through hero slides
-        heroPager.setOnKeyListener((v, keyCode, event) -> {
-            if (event.getAction() != android.view.KeyEvent.ACTION_DOWN) return false;
-            int count = heroAdapter.getItemCount();
-            if (count == 0) return false;
-            int current = heroPager.getCurrentItem();
-            if (keyCode == android.view.KeyEvent.KEYCODE_DPAD_LEFT) {
-                heroPager.setCurrentItem((current - 1 + count) % count, true);
-                return true;
-            } else if (keyCode == android.view.KeyEvent.KEYCODE_DPAD_RIGHT) {
-                heroPager.setCurrentItem((current + 1) % count, true);
-                return true;
-            }
-            return false;
-        });
+        // D-pad: ViewPager2 intercepts key events internally,
+        // so we handle them in dispatchKeyEvent() at the Activity level.
     }
 
     private void startHeroAutoplay() {
