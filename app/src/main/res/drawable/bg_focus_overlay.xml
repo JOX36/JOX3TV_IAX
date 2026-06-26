@@ -3,21 +3,29 @@
     <!-- Solo se ve cuando el control remoto/D-pad selecciona este elemento.
          En celular (modo táctil) Android nunca activa state_focused así,
          por lo que esto es invisible al tocar con el dedo.
-         Solo contorno neón rojo, sin relleno interior. -->
+         Incluye un oscurecido de fondo para que el contorno se note
+         siempre, sin importar el color de lo que esté debajo. -->
     <item android:state_focused="true">
         <layer-list>
-            <!-- Capa exterior mas ancha y tenue: efecto de resplandor -->
+            <!-- Oscurece levemente el fondo para garantizar contraste -->
             <item>
                 <shape android:shape="rectangle">
-                    <stroke android:width="6dp" android:color="#55FF1744" />
+                    <solid android:color="#40000000" />
+                    <corners android:radius="10dp" />
+                </shape>
+            </item>
+            <!-- Resplandor exterior tenue -->
+            <item>
+                <shape android:shape="rectangle">
+                    <stroke android:width="7dp" android:color="#66FF1744" />
                     <corners android:radius="10dp" />
                     <solid android:color="@android:color/transparent" />
                 </shape>
             </item>
-            <!-- Capa interior nítida: el contorno neón propiamente -->
+            <!-- Contorno neón nítido -->
             <item>
                 <shape android:shape="rectangle">
-                    <stroke android:width="2.5dp" android:color="#FF1744" />
+                    <stroke android:width="3dp" android:color="#FF1744" />
                     <corners android:radius="10dp" />
                     <solid android:color="@android:color/transparent" />
                 </shape>
