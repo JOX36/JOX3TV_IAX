@@ -275,20 +275,6 @@ public class HomeActivity extends AppCompatActivity {
             }
         }
 
-        // DIAGNÓSTICO TEMPORAL: si cae aquí es porque no encontró ninguna
-        // coincidencia. Este Toast nos dice exactamente por qué, para
-        // saber si el problema es que "recientes" viene vacío, o que sí
-        // trae datos pero no hace match contra los canales actuales.
-        int liveCountInRecent = 0;
-        for (MediaItem recent : recentList) {
-            if (MediaItem.LIVE.equals(recent.type)) liveCountInRecent++;
-        }
-        android.widget.Toast.makeText(this,
-                "DEBUG mini-player: recientes=" + recentList.size()
-                        + " (en vivo entre ellos=" + liveCountInRecent + ")"
-                        + " · canales totales=" + state.liveChannels.size(),
-                android.widget.Toast.LENGTH_LONG).show();
-
         if (state.liveChannels.isEmpty()) return null;
         int randomIndex = (int) (Math.random() * state.liveChannels.size());
         return state.liveChannels.get(randomIndex);

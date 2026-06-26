@@ -1,5 +1,9 @@
 package com.jox3.tv.ui.home;
 
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
+import android.graphics.drawable.StateListDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +37,7 @@ public class CategoryChipAdapter extends RecyclerView.Adapter<CategoryChipAdapte
     public ChipHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_category_chip, parent, false);
+        view.setForeground(buildChipForeground());
         return new ChipHolder((TextView) view);
     }
 
@@ -46,6 +51,16 @@ public class CategoryChipAdapter extends RecyclerView.Adapter<CategoryChipAdapte
                 isSelected ? R.drawable.bg_chip_active : R.drawable.bg_chip_inactive);
         holder.text.setTextColor(holder.text.getContext().getColor(
                 isSelected ? R.color.text_primary : R.color.text_secondary));
+
+        holder.text.setOnFocusChangeListener((v, hasFocus) -> {
+            v.refreshDrawableState();
+            if (hasFocus) {
+                v.bringToFront();
+                v.animate().scaleX(1.08f).scaleY(1.08f).setDuration(120).start();
+            } else {
+                v.animate().scaleX(1.0f).scaleY(1.0f).setDuration(120).start();
+            }
+        });
 
         holder.itemView.setOnClickListener(v -> {
             String previous = selectedCategory;
@@ -64,12 +79,6 @@ public class CategoryChipAdapter extends RecyclerView.Adapter<CategoryChipAdapte
         return categories.size();
     }
 
-    /**
-     * Actualiza la lista de categorías disponibles SIN perder la selección
-     * actual: si la categoría que estaba marcada todavía existe en la
-     * lista nueva, se mantiene seleccionada. Solo si ya no existe (por
-     * ejemplo, cambiaste de cuenta) vuelve a la primera por defecto.
-     */
     public void updateCategories(List<String> newCategories) {
         categories.clear();
         categories.addAll(newCategories);
@@ -80,9 +89,45 @@ public class CategoryChipAdapter extends RecyclerView.Adapter<CategoryChipAdapte
         notifyDataSetChanged();
     }
 
-    /** Para que HomeActivity pueda mantenerse sincronizado con la selección real. */
     public String getSelectedCategory() {
         return selectedCategory;
+    }
+
+    private static Drawable buildChipForeground() {
+        StateListDrawable selector = new StateListDrawable();
+        selector.addState(
+                new int[]{android.R.attr.state_focused},
+                buildFocusRing());
+        GradientDrawable transparent = new GradientDrawable();
+        transparent.setColor(0x00000000);
+        transparent.setCornerRadius(dp(10));
+        selector.addState(new int[]{}, transparent);
+        return selector;
+    }
+
+    private static Drawable buildFocusRing() {
+        GradientDrawable dimBg = new GradientDrawable();
+        dimBg.setShape(GradientDrawable.RECTANGLE);
+        dimBg.setColor(0x3000FF88);
+        dimBg.setCornerRadius(dp(10));
+
+        GradientDrawable glow = new GradientDrawable();
+        glow.setShape(GradientDrawable.RECTANGLE);
+        glow.setStroke(dp(7), 0x4400FF88);
+        glow.setCornerRadius(dp(10));
+        glow.setColor(0x00000000);
+
+        GradientDrawable ring = new GradientDrawable();
+        ring.setShape(GradientDrawable.RECTANGLE);
+        ring.setStroke(dp(3), 0xFF00FF88);
+        ring.setCornerRadius(dp(10));
+        ring.setColor(0x00000000);
+
+        return new LayerDrawable(new Drawable[]{dimBg, glow, ring});
+    }
+
+    private static int dp(int value) {
+        return (int) (value * android.content.res.Resources.getSystem().getDisplayMetrics().density);
     }
 
     static class ChipHolder extends RecyclerView.ViewHolder {

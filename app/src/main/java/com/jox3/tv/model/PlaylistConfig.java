@@ -5,6 +5,8 @@ import java.util.UUID;
 
 public class PlaylistConfig implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     public static final String TYPE_XTREAM = "xtream";
     public static final String TYPE_M3U = "m3u";
 

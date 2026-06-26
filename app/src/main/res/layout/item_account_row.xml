@@ -54,7 +54,7 @@
         android:paddingTop="6dp"
         android:paddingBottom="6dp"
         android:text="Eliminar"
-        android:textColor="#FF7A6E"
+        android:textColor="#FF4466"
         android:textSize="11sp"
         android:textAllCaps="false"
         android:clickable="true"

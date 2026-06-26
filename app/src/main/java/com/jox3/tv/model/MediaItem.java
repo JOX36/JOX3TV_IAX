@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 public class MediaItem implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     public static final String LIVE = "live";
     public static final String VOD = "vod";
     public static final String SERIES = "series";
